@@ -1,28 +1,26 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://pixabay.com/api/';
-const API_KEY = '51361709-3ae7eddc83ad637b7c3fc8345';
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
 
-export function getImagesByQuery(query) {
+import { BASE_URL, API_KEY, defaultParams } from './helpers';
+
+export async function getImagesByQuery(query, page) {
   const params = new URLSearchParams({
     key: API_KEY,
     q: query,
-    image_type: 'photo',
-    orientation: 'horizontal',
-    safesearch: true,
-    per_page: 9,
+    page,
+    ...defaultParams,
   });
-
-  return axios
-    .get(`${BASE_URL}?${params}`)
-    .then(res => res.data)
-    .catch(error => {
-      iziToast.error({
-        title: 'Error',
-        message: `Failed to retrieve image. Please try again later.`,
-        position: 'topRight',
-        timeout: 4000,
-      });
-      return { hits: [] };
+  try {
+    const response = await axios.get(`${BASE_URL}?${params}`);
+    return response.data;
+  } catch (error) {
+    iziToast.error({
+      title: 'Error',
+      message: `Ooops! Somethings went wrong`,
+      position: 'topRight',
+      timeout: 4000,
     });
+  }
 }

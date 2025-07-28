@@ -1,15 +1,13 @@
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
-
-const galleryList = document.querySelector('.js-gallery');
-const loader = document.querySelector('.loader');
-
-let lightbox = null;
+import { refreshLightbox, galleryList } from './helpers';
 
 export function createGallery(images) {
-  clearGallery();
   const markup = images
     .map(({ largeImageURL, webformatURL, tags, ...rest }) => {
+      const trimmedTags = tags
+        .split(',')
+        .map(tag => tag.trim())
+        .slice(0, 3)
+        .join(',');
       const infoItems = ['Likes', 'Views', 'Comments', 'Downloads']
         .map(
           item => `
@@ -19,40 +17,14 @@ export function createGallery(images) {
             </li>`
         )
         .join('');
-return `<li class="gallery-item">
+      return `<li class="gallery-item">
           <a class="gallery-link" href="${largeImageURL}">
-            <img class="gallery-image" src="${webformatURL}" alt="${tags}" />
+            <img class="gallery-image" src="${webformatURL}" alt="${trimmedTags}" />
             <ul class="images-info-list">${infoItems}</ul>
           </a>
         </li>`;
     })
     .join('');
-  galleryList.innerHTML = markup;
+  galleryList.insertAdjacentHTML('beforeend', markup);
   refreshLightbox();
-}
-
-export function clearGallery() {
-  galleryList.innerHTML = '';
-}
-
-export function showLoader() {
-  loader.classList.remove('hidden');
-}
-
-export function hideLoader() {
-  loader.classList.add('hidden');
-}
-
-export function refreshLightbox() {
-  if (lightbox) {
-    lightbox.refresh();
-  } else {
-    lightbox = new SimpleLightbox('.js-gallery a', {
-      captionsData: false,
-      captionDelay: 500,
-      doubleTapZoom: 1.2,
-      maxZoom: 4,
-      disableScroll: true,
-    });
   }
-}
